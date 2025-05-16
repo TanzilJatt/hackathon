@@ -1,14 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { useAuth } from '../../hooks/use-auth';
 import { analyzeSymptoms, analyzeImage } from '../../lib/ai';
 import { db, storage } from '../../lib/firebase';
 import { ref, uploadBytes, getDownloadURL } from 'firebase/storage';
 import { collection, addDoc, Timestamp } from 'firebase/firestore';
 
 export default function SubmitPage() {
-  const { user } = useAuth();
   const [symptoms, setSymptoms] = useState('');
   const [age, setAge] = useState('');
   const [gender, setGender] = useState('');
@@ -32,17 +30,20 @@ export default function SubmitPage() {
 
       // Analyze symptoms
       const symptomAnalysis = await analyzeSymptoms(symptoms);
+      setAnalysis(symptomAnalysis);
 
-      // Analyze image if provided
+      // If image is provided, analyze it
       let imageUrl = '';
       if (image) {
-        const storageRef = ref(storage, `images/${user?.uid}/${Date.now()}-${image.name}`);
-        await uploadBytes(storageRef, image);
-        imageUrl = await getDownloadURL(storageRef);
+        const imageRef = ref(storage, `images/${image.name}`);
+        await uploadBytes(imageRef, image);
+        imageUrl = await getDownloadURL(imageRef);
+        const imageAnalysis = await analyzeImage(imageUrl);
+        setAnalysis({ ...analysis, imageAnalysis });
       }
 
-      // Save to Firestore
-      const submissionsRef = collection(db, 'users', user?.uid!, 'submissions');
+      // Save to database
+      const submissionsRef = collection(db, 'submissions');
       await addDoc(submissionsRef, {
         symptoms,
         age,

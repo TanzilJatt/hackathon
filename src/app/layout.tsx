@@ -1,14 +1,13 @@
 import type { Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { AuthProvider } from './hooks/use-auth';
 import React from 'react';
 
 const inter = Inter({ subsets: ['latin'] });
 
 export const metadata: Metadata = {
   title: 'MediScout Pakistan',
-  description: 'Healthcare triage and early diagnosis platform',
+  description: 'AI-powered healthcare triage and early diagnosis',
 };
 
 export default function RootLayout({

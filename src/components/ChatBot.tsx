@@ -48,7 +48,15 @@ Bot: ${botMessages}
 
 Current message: ${input}`);
       
-      const botResponse = analysis.content;
+      // Format the response to include all relevant information
+      const botResponse = `Based on your symptoms, here's what I found:
+
+Condition: ${analysis.condition}
+Severity: ${analysis.severity}
+Risk Level: ${analysis.riskLevel}
+
+Recommendations:
+${analysis.recommendations.join('\n')}`;
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),

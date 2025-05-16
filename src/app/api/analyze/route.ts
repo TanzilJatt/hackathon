@@ -1,12 +1,13 @@
 import { NextResponse } from 'next/server';
 import OpenAI from 'openai';
 
+// Use a fallback API key for development
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY
+  apiKey: process.env.OPENAI_API_KEY || 'sk-DEV_FALLBACK_KEY'  // Replace with your actual API key
 });
 
 if (!openai.apiKey) {
-  throw new Error('OpenAI API key not found. Please set OPENAI_API_KEY in your .env file.');
+  console.warn('Using fallback OpenAI API key for development. Please set OPENAI_API_KEY in your .env file for production.');
 }
 
 export async function POST(request: Request) {

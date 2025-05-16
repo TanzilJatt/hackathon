@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { useAuth } from '../../hooks/use-auth';
-import { db } from '../../lib/firebase';
 import { collection, query, where, orderBy, getDocs } from 'firebase/firestore';
+import { db } from '../../lib/firebase';
 
 interface Submission {
   id: string;
@@ -18,7 +17,6 @@ interface Submission {
 }
 
 export default function DashboardPage() {
-  const { user } = useAuth();
   const [submissions, setSubmissions] = useState<Submission[]>([]);
   const [searchTerm, setSearchTerm] = useState('');
   const [loading, setLoading] = useState(true);
@@ -27,7 +25,7 @@ export default function DashboardPage() {
   useEffect(() => {
     const fetchSubmissions = async () => {
       try {
-        const submissionsRef = collection(db, 'users', user?.uid!, 'submissions');
+        const submissionsRef = collection(db, 'submissions');
         const q = query(
           submissionsRef,
           where('symptoms', '>=', searchTerm),
@@ -35,10 +33,20 @@ export default function DashboardPage() {
         );
         
         const querySnapshot = await getDocs(q);
-        const submissions = querySnapshot.docs.map(doc => ({
-          id: doc.id,
-          ...doc.data()
-        }));
+        const submissions = querySnapshot.docs.map(doc => {
+          const data = doc.data();
+          return {
+            id: doc.id,
+            symptoms: data.symptoms || '',
+            age: data.age || '',
+            gender: data.gender || '',
+            temperature: data.temperature || '',
+            bloodPressure: data.bloodPressure || '',
+            imageUrl: data.imageUrl || '',
+            analysis: data.analysis || {},
+            timestamp: data.timestamp
+          };
+        });
         
         setSubmissions(submissions);
       } catch (err) {
@@ -48,10 +56,8 @@ export default function DashboardPage() {
       }
     };
 
-    if (user) {
-      fetchSubmissions();
-    }
-  }, [user, searchTerm]);
+    fetchSubmissions();
+  }, [searchTerm]);
 
   const handleSearch = (e: React.ChangeEvent<HTMLInputElement>) => {
     setSearchTerm(e.target.value);

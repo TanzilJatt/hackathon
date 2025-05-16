@@ -48,15 +48,13 @@ Bot: ${botMessages}
 
 Current message: ${input}`);
       
-      // Format the response to include all relevant information
-      const botResponse = `Based on your symptoms, here's what I found:
+      // Format the response to include follow-up questions and recommendations
+      const botResponse = `
+${analysis.content}
 
-Condition: ${analysis.condition}
-Severity: ${analysis.severity}
-Risk Level: ${analysis.riskLevel}
+Please answer the questions above to help me provide a more accurate diagnosis.
 
-Recommendations:
-${analysis.recommendations.join('\n')}`;
+Would you like to add more symptoms or details for better accuracy?`;
 
       const botMessage: Message = {
         id: (Date.now() + 1).toString(),

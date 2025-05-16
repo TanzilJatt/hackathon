@@ -1,4 +1,5 @@
 export interface SymptomAnalysis {
+  content: string;
   condition: string;
   severity: string;
   recommendations: string[];

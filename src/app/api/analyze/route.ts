@@ -3,14 +3,22 @@ import OpenAI from 'openai';
 
 // Use a fallback API key for development
 const openai = new OpenAI({
-  apiKey: process.env.OPENAI_API_KEY || 'sk-DEV_FALLBACK_KEY'  // Replace with your actual API key
+  apiKey: process.env.OPENAI_API_KEY
 });
 
 if (!openai.apiKey) {
-  console.warn('Using fallback OpenAI API key for development. Please set OPENAI_API_KEY in your .env file for production.');
+  console.error('OpenAI API key not found. Please set OPENAI_API_KEY in your .env file.');
+  throw new Error('OpenAI API key not configured');
 }
 
 export async function POST(request: Request) {
+  if (!openai.apiKey) {
+    console.warn('No OpenAI API key found. Please set OPENAI_API_KEY in your .env file.');
+    return NextResponse.json(
+      { error: 'OpenAI API key not configured. Please contact the administrator.' },
+      { status: 500 }
+    );
+  }
   try {
     const { symptoms } = await request.json();
 
